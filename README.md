@@ -1,2 +1,2 @@
 # ml-from-scratch
-Building a neural network from scratch in multiple languages.
+I have challenged myself to build some neural network infrastructure from scratch. In the style of PyTorch, I want to implement the Dense layer, Conv layer (up to 4D), MaxPool layer (up to 4D), Dropout layer, and Flatten layer. All of these, where applicable, will be fully trainable using gradient descent. I will then use these to construct full neural networks, mainly CNNs. Part of the challenge is also implementing these in various languages, like Python, C, and Fortran. If a further challenge is desired, I can implement them using both imperative and functional paradigms.
