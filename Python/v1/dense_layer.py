@@ -18,6 +18,10 @@ class LinearActivation(Activation):
     def __init__(self):
         super().__init__(lambda x: x, lambda x: 1)
 
+class ReLUActivation(Activation):
+    def __init__(self):
+        super().__init__(lambda x: np.maximum(x, 0), lambda x: 0 if x < 0 else 1)
+
 class DenseLayer:
     def __init__(self, size: int_t, activation: Activation):
         self.size: int_t = size
@@ -28,13 +32,13 @@ class DenseLayer:
     def activated(self) -> np.ndarray:
         return self.activation.evaluate(self.values)
     def __repr__(self) -> str:
-        return str(self.values)
+        return f'{str(self.values)} -> {self.activated()}'
 
 class DenseInterconnect:
     def __init__(self, in_size: int_t, out_size: int_t):
         self.size: tuple[int_t, int_t] = (in_size, out_size)
-        self.weights: np.ndarray = np.random.random_sample(self.size).astype(float_t)
-        self.biases: np.ndarray = np.random.random_sample(self.size[1]).astype(float_t)
+        self.weights: np.ndarray = float_t(2) * np.random.random_sample(self.size).astype(float_t) - float_t(1)
+        self.biases: np.ndarray = float_t(2) * np.random.random_sample(self.size[1]).astype(float_t) - float_t(1)
     def forward_pass(self, x: np.ndarray, y: np.ndarray) -> None:
         np.matmul(x, self.weights, out=y)
         np.add(y, self.biases, out=y)
@@ -60,8 +64,8 @@ class DenseNetwork:
         for idx, interconnect in enumerate(self.dense_interconnects):
             from_layer = self.dense_layers[idx]
             to_layer = self.dense_layers[idx + 1]
-            interconnect.forward_pass(from_layer.values, to_layer.values)
-        return self.dense_layers[-1].values
+            interconnect.forward_pass(from_layer.activated(), to_layer.values)
+        return self.dense_layers[-1].activated()
     def __repr__(self) -> str:
         reprs: list[str] = [repr(self.dense_layers[0])]
         for idx, interconnect in enumerate(self.dense_interconnects):
@@ -70,9 +74,9 @@ class DenseNetwork:
         return '\n'.join(reprs)
 
 if __name__ == '__main__':
-    l1 = DenseLayer(int_t(2), LinearActivation())
-    l2 = DenseLayer(int_t(2), LinearActivation())
-    l3 = DenseLayer(int_t(2), LinearActivation())
+    l1 = DenseLayer(int_t(2), ReLUActivation())
+    l2 = DenseLayer(int_t(2), ReLUActivation())
+    l3 = DenseLayer(int_t(2), ReLUActivation())
 
     n = DenseNetwork(l1, l2, l3)
     n.forward_pass(np.array([1, 2]))
